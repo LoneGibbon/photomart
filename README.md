@@ -1,4 +1,5 @@
 PhotoMart - Full Stack Application Setup
+
 Instructions:
 This project is a full stack photography marketplace built using React
 (Frontend) and Spring Boot (Backend) with H2 Database. This file
