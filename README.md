@@ -23,6 +23,7 @@ photomart/
 ├── photomart-frontend/ (React App)
 ├── photomart-backend/ (Spring Boot App)
 └── README (this file)
+
 🚀 Backend Setup (Spring Boot):
 
 1. Open your terminal.
@@ -42,7 +43,9 @@ photomart/
    Username and password are configured in application.properties.
    (username: sa)
    Note: Make sure port 8080 is free when starting the backend.
+
    🚀 Frontend Setup (React):
+
 5. Open another terminal window or tab.
 6. Navigate to the frontend folder:
    cd photomart-frontend
