@@ -24,6 +24,12 @@ photomart/
 ├── photomart-backend/ (Spring Boot App)
 └── README (this file)
 
+---
+
+---
+
+---
+
 🚀 Backend Setup (Spring Boot):
 
 1. Open your terminal.
@@ -33,6 +39,7 @@ photomart/
    ./mvnw clean install
 4. Start the backend server:
    ./mvnw spring-boot:run
+
    ✅ The backend will start running at: http://localhost:8080
    •
    H2 Console (for database access) available at:
@@ -44,7 +51,13 @@ photomart/
    (username: sa)
    Note: Make sure port 8080 is free when starting the backend.
 
-   🚀 Frontend Setup (React):
+---
+
+---
+
+---
+
+🚀 Frontend Setup (React):
 
 5. Open another terminal window or tab.
 6. Navigate to the frontend folder:
@@ -53,6 +66,7 @@ photomart/
    npm install
 8. Start the React frontend application:
    npm run dev
+
    ✅ The frontend app will start running at: http://localhost:3000
    •
    It will automatically connect with the backend running on
