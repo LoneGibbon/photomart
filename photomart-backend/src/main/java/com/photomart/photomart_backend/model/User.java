@@ -1,4 +1,6 @@
 package com.photomart.photomart_backend.model;
+import lombok.Getter;
+import lombok.Setter;
 
 import jakarta.persistence.*;
 
@@ -9,6 +11,8 @@ import jakarta.persistence.*;
  * Users can either be Customers or Sellers.
  * Mapped automatically to the "users" table in the database.
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -25,6 +29,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role; // User role: either CUSTOMER or SELLER
 
+    private String fullName;
+    private String phoneNumber;
+    private String address;
+
+    @Column(columnDefinition = "CLOB")
+    private String profileImage;
     /**
      * Role
      * 

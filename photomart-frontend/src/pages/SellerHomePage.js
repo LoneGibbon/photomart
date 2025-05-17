@@ -32,6 +32,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddIcon from "@mui/icons-material/Add";
 import { getDecryptedItem } from "../utils/encryptedStore";
 import { log } from "../utils/logger";
+import Avatar from "@mui/material/Avatar";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 // Predefined categories sellers can choose from
 const initialCategories = [
@@ -54,11 +56,76 @@ const SellerHomePage = ({ onLogout }) => {
     category: "",
     image: "",
   });
+  const [openProfileDialog, setOpenProfileDialog] = useState(false);
+  const [profile, setProfile] = useState({
+    email: "",
+    fullName: "",
+    phone: "",
+    address: "",
+    profileImage: "",
+  });
 
   // Fetch seller's own products when page loads
   useEffect(() => {
     fetchProducts();
+
+    const fetchProfile = async () => {
+      try {
+        const email = getDecryptedItem("user").email;
+        const res = await axios.get(
+          `http://localhost:8080/api/profile?email=${email}`
+        );
+        setProfile(res.data);
+      } catch (err) {
+        console.error("Failed to load profile on mount", err);
+      }
+    };
+
+    fetchProfile();
   }, []);
+
+  // Fetch profile when dialog opens
+  const handleOpenProfile = async () => {
+    try {
+      const email = getDecryptedItem("user").email;
+      // log("Email is: ", email);
+      const res = await axios.get(
+        `http://localhost:8080/api/profile?email=${email}`
+      );
+      log("Profile: ", res.data);
+      setProfile(res.data);
+      setOpenProfileDialog(true);
+    } catch (err) {
+      console.error("Failed to load profile", err);
+    }
+  };
+
+  const handleCloseProfile = () => setOpenProfileDialog(false);
+
+  const handleProfileChange = (field, value) => {
+    setProfile({ ...profile, [field]: value });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfile((prev) => ({ ...prev, profileImage: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      log("Profile : ", profile);
+      await axios.put("http://localhost:8080/api/profile", profile);
+      setOpenProfileDialog(false);
+    } catch (err) {
+      console.error("Failed to save profile", err);
+    }
+  };
 
   /**
    * Fetches the products uploaded by the logged-in seller.
@@ -137,7 +204,7 @@ const SellerHomePage = ({ onLogout }) => {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#F1FAEE", minHeight: "100vh", pb: 6 }}>
+    <Box sx={{ backgroundColor: "#FFFFFF", minHeight: "100vh", pb: 6 }}>
       {/* AppBar at the top */}
       <AppBar position="static" color="transparent" elevation={0}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -148,13 +215,31 @@ const SellerHomePage = ({ onLogout }) => {
           {/* Profile/Logout Menu */}
           <Box>
             <IconButton onClick={handleMenuOpen}>
-              <MoreVertIcon />
+              <Avatar
+                alt="Profile"
+                src={profile.profileImage || ""}
+                sx={{ width: 36, height: 36 }}
+              >
+                {profile.fullName ? (
+                  profile.fullName.charAt(0)
+                ) : (
+                  <AccountCircleIcon />
+                )}
+              </Avatar>
             </IconButton>
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
+              <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  handleOpenProfile();
+                }}
+              >
+                Profile
+              </MenuItem>
               <MenuItem
                 onClick={() => {
                   handleMenuClose();
@@ -302,6 +387,74 @@ const SellerHomePage = ({ onLogout }) => {
       >
         <AddIcon />
       </Fab>
+
+      <Dialog
+        open={openProfileDialog}
+        onClose={handleCloseProfile}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Edit Profile</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+            <label htmlFor="upload-photo">
+              <input
+                style={{ display: "none" }}
+                id="upload-photo"
+                name="upload-photo"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+              <Avatar
+                src={profile.profileImage || ""}
+                sx={{ width: 80, height: 80, cursor: "pointer" }}
+              >
+                {profile.fullName ? (
+                  profile.fullName.charAt(0)
+                ) : (
+                  <AccountCircleIcon />
+                )}
+              </Avatar>
+            </label>
+          </Box>
+          <TextField
+            margin="dense"
+            label="Email"
+            value={profile.email}
+            fullWidth
+            disabled
+          />
+          <TextField
+            margin="dense"
+            label="Full Name"
+            value={profile.fullName}
+            onChange={(e) => handleProfileChange("fullName", e.target.value)}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Phone Number"
+            value={profile.phoneNumber}
+            onChange={(e) => handleProfileChange("phoneNumber", e.target.value)}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Address"
+            value={profile.address}
+            onChange={(e) => handleProfileChange("address", e.target.value)}
+            fullWidth
+            multiline
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseProfile}>Cancel</Button>
+          <Button onClick={handleSaveProfile} variant="contained">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
